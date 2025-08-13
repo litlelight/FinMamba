@@ -1,71 +1,255 @@
-<img width="369" height="246" alt="image" src="https://github.com/user-attachments/assets/7e1d9c77-06bd-4e8d-963a-69fcca7a076e" />
-Official implementation of "Selective State Space Modeling with Mixture of Experts: A Mathematical Framework for Dynamic Financial Time Series Classification"
+# FinMamba: Financial Bankruptcy Prediction via Selective State Space with Expert Networks
 
-🚀 Overview
-This repository contains the complete implementation of DCMoET+FinSSS, a novel deep learning framework for cross-regional bankruptcy prediction that combines:
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.1.0-red.svg)](https://pytorch.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Paper](https://img.shields.io/badge/Paper-arXiv-green.svg)](https://arxiv.org/abs/xxxx.xxxxx)
 
-🧠 Financial Selective State Space Model (FinSSS): Linear-complexity temporal modeling with content-aware parameter selection
-👥 Mixture of Experts Network: Domain-specific analysis across four financial dimensions
-🔄 Dynamic Cross-Modal Fusion: Intelligent integration of temporal and expert-driven features
+## 📋 Overview
 
-🏆 Key Achievements
+FinMamba is a novel deep learning architecture that integrates **selective state space modeling** with **domain-specific expert networks** for cross-regional bankruptcy prediction. The framework addresses computational bottlenecks in traditional methods while achieving superior predictive performance through linear computational complexity and enhanced cross-regional adaptability.
 
-93.7% Accuracy on Taiwan dataset
-89.2% AUC with 83.4% Recall rate
-Linear O(n) computational complexity
-Cross-regional generalization (Taiwan ↔ US markets)
+### 🎯 Key Features
 
- Datasets
-Taiwan Bankruptcy Dataset
+- **Linear Complexity**: Selective state space modeling enables O(L) computational complexity vs O(L²) for attention-based models
+- **Domain Expertise Integration**: Mixture-of-experts network explicitly models four financial analysis dimensions
+- **Cross-Regional Robustness**: Validated across Taiwan and US markets with consistent performance
+- **Early Warning Capability**: Provides bankruptcy alerts up to 22 months in advance
+- **Regulatory Compliance**: SHAP-based interpretability for transparent decision-making
 
-Companies: 6,819 (220 bankrupt, 6,599 non-bankrupt)
-Features: 95 financial indicators
-Period: 1999-2009
-Source: Taiwan Economic Journal
+## 🏗️ Architecture
 
-US Bankruptcy Dataset
+FinMamba consists of three core components:
 
-Companies: 8,262 companies
-Features: 95 corresponding financial indicators
-Period: 1999-2018
-Source: NYSE and NASDAQ listings
+1. **Financial Selective State Space Model (FinSSS)**: Adaptively focuses on temporally important information through content-aware parameter selection
+2. **Mixture-of-Experts (MoE) Networks**: Decomposes financial analysis into specialized dimensions (profitability, liquidity, leverage, operational efficiency)
+3. **Cross-Modal Fusion Mechanism**: Combines temporal and expert-driven features through bidirectional attention
 
-Data Privacy Note
-Raw datasets contain sensitive financial information and are provided in anonymized, aggregated form compliant with data protection regulations.
+![FinMamba Architecture](assets/architecture.png)
 
-🏆 Results
-Performance Comparison
-ModelTaiwan DatasetUS DatasetAccPrecRecAUCAccPrecRecAUCDCMoET+FinSSS93.7%72.1%83.4%89.2%92.5%68.7%79.8%87.6%Transformer91.2%64.8%77.4%86.3%89.8%60.1%74.3%83.4%LSTM90.8%63.4%76.9%85.7%89.3%58.7%73.1%82.6%XGBoost90.3%61.2%75.8%84.6%88.9%56.3%72.1%81.4%
-Ablation Study Results
-ComponentTaiwan AUCUS AUCImprovementBaseline74.2%71.8%-+ FinSSS80.4%77.3%+6.2% / +5.5%+ MoE83.9%80.8%+3.5% / +3.5%+ Fusion89.2%87.6%+5.3% / +6.8%
+## 📊 Performance Results
 
-🔧 Model Architecture
-Core Components
+| Dataset | Metric | FinMamba | QTIAH-GNN | Text-ML Fusion | Improvement |
+|---------|--------|----------|-----------|----------------|-------------|
+| Taiwan  | Accuracy | **93.7%** | 91.9% | 92.4% | +1.8% |
+| Taiwan  | AUC | **89.2%** | 87.8% | 87.1% | +1.4% |
+| Taiwan  | Recall | **83.4%** | 80.2% | 78.9% | +3.2% |
+| US      | Accuracy | **92.5%** | 90.4% | 91.1% | +2.1% |
+| US      | AUC | **87.6%** | 85.4% | 86.2% | +2.2% |
 
-FinSSS Module: Selective state space modeling with O(n) complexity
-Expert Networks: 4 specialized networks for financial dimensions
-Cross-Modal Fusion: Dynamic attention-based feature integration
+*Statistical significance: p < 0.01, Cohen's d > 1.4*
 
-Mathematical Framework
-State Evolution: h_t = Ā·h_{t-1} + B̄·x_t
-Selection Mechanism: s_t = σ(W_s·x_t + b_s)
-Expert Gating: α_t = softmax(W_g·tanh(W_h·H_t + W_c·C_t))
-Cross-Modal Fusion: H^enhanced = H + CrossAttn(H, O_experts, O_experts)
+## 🚀 Quick Start
 
-📈 Interpretability Analysis
-SHAP Value Analysis
-pythonfrom utils.interpretability import SHAPAnalyzer
+### Installation
 
-# Generate SHAP explanations
-analyzer = SHAPAnalyzer(model)
-shap_values = analyzer.explain_predictions(test_data)
-analyzer.plot_feature_importance(shap_values)
-Case Study Analysis
-pythonfrom experiments.case_study import analyze_bankruptcy_cases
+```bash
+# Clone the repository
+git clone https://github.com/litlelight/FinMamba.git
+cd FinMamba
 
-# Analyze specific bankruptcy cases
-results = analyze_bankruptcy_cases(
-    model=trained_model,
-    companies=['Taiwan_Electronics_001', 'US_Retail_042'],
-    forecast_horizon=24
+# Create virtual environment
+conda create -n finmamba python=3.8
+conda activate finmamba
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Requirements
+
+```
+torch>=2.1.0
+numpy>=1.24.0
+pandas>=1.5.0
+scikit-learn>=1.3.0
+transformers>=4.35.0
+shap>=0.42.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+```
+
+### Basic Usage
+
+```python
+from finmamba import FinMambaModel, DataProcessor
+
+# Load and preprocess data
+processor = DataProcessor()
+X_train, y_train = processor.load_data('data/taiwan_bankruptcy.csv')
+X_train, y_train = processor.preprocess(X_train, y_train)
+
+# Initialize and train model
+model = FinMambaModel(
+    input_dim=95,
+    hidden_dim=256,
+    num_experts=4,
+    sequence_length=12
 )
+
+model.fit(X_train, y_train, epochs=50, batch_size=32)
+
+# Make predictions
+predictions = model.predict(X_test)
+probabilities = model.predict_proba(X_test)
+```
+
+## 📁 Project Structure
+
+```
+FinMamba/
+├── finmamba/
+│   ├── models/
+│   │   ├── finmamba.py          # Main FinMamba architecture
+│   │   ├── finsss.py            # Financial Selective State Space Model
+│   │   ├── experts.py           # Mixture-of-Experts networks
+│   │   └── fusion.py            # Cross-modal fusion mechanism
+│   ├── data/
+│   │   ├── processor.py         # Data preprocessing utilities
+│   │   └── loader.py            # Dataset loading functions
+│   └── utils/
+│       ├── metrics.py           # Evaluation metrics
+│       ├── visualization.py     # Plotting utilities
+│       └── interpretability.py  # SHAP analysis tools
+├── experiments/
+│   ├── train.py                 # Training script
+│   ├── evaluate.py              # Evaluation script
+│   ├── ablation_study.py        # Ablation experiments
+│   └── hyperparameter_tuning.py # Hyperparameter optimization
+├── configs/
+│   ├── taiwan_config.yaml       # Taiwan dataset configuration
+│   └── us_config.yaml           # US dataset configuration
+├── notebooks/
+│   ├── data_exploration.ipynb   # Data analysis notebooks
+│   ├── model_analysis.ipynb     # Model interpretation
+│   └── case_studies.ipynb       # Bankruptcy case studies
+├── data/
+│   ├── processed/               # Processed datasets
+│   └── synthetic/               # Synthetic replication data
+├── results/
+│   ├── figures/                 # Generated plots and figures
+│   ├── logs/                    # Training logs
+│   └── models/                  # Saved model checkpoints
+└── README.md
+```
+
+## 📈 Reproducing Results
+
+### 1. Data Preparation
+
+```bash
+# Download and prepare Taiwan dataset
+python data/prepare_taiwan_data.py
+
+# Download and prepare US dataset  
+python data/prepare_us_data.py
+```
+
+### 2. Train FinMamba Model
+
+```bash
+# Train on Taiwan dataset
+python experiments/train.py --config configs/taiwan_config.yaml
+
+# Train on US dataset
+python experiments/train.py --config configs/us_config.yaml
+```
+
+### 3. Run Experiments
+
+```bash
+# Comparative analysis
+python experiments/comparative_analysis.py
+
+# Ablation study
+python experiments/ablation_study.py
+
+# Hyperparameter tuning
+python experiments/hyperparameter_tuning.py
+
+# Case study analysis
+python experiments/case_studies.py
+```
+
+## 📊 Data Availability
+
+### Taiwan Bankruptcy Dataset
+- **Source**: Taiwan Economic Journal (TEJ) - *Requires institutional subscription*
+- **Period**: 1999-2009
+- **Companies**: 6,819 (220 bankrupt, 6,599 non-bankrupt)
+- **Features**: 95 financial indicators
+
+### US Bankruptcy Dataset
+- **Source**: Public SEC filings (NYSE/NASDAQ)
+- **Period**: 1999-2018  
+- **Companies**: 8,262 (~2.5% bankruptcy rate)
+- **Features**: Corresponding financial indicators
+
+### Synthetic Replication Data
+For reproducibility, we provide synthetic datasets that preserve statistical properties:
+```bash
+# Generate synthetic Taiwan data
+python data/generate_synthetic_taiwan.py
+
+# Generate synthetic US data
+python data/generate_synthetic_us.py
+```
+
+## 🔧 Hyperparameter Configuration
+
+Key hyperparameters and their optimal values:
+
+| Parameter | Taiwan | US | Description |
+|-----------|--------|----|----|
+| Learning Rate | 0.001 | 0.001 | Adam optimizer learning rate |
+| Batch Size | 32 | 64 | Training batch size |
+| Hidden Dimension | 256 | 256 | Model hidden state dimension |
+| Sequence Length | 12 | 16 | Input temporal sequence length |
+| Dropout Rate | 0.3 | 0.4 | Regularization dropout rate |
+| Num Experts | 4 | 4 | Number of expert networks |
+
+## 📖 Citation
+
+If you use this code in your research, please cite our paper:
+
+```bibtex
+@article{finmamba2024,
+  title={FinMamba: Financial Bankruptcy Prediction via Selective State Space with Expert Networks},
+  author={[Authors]},
+  journal={[Journal]},
+  year={2024},
+  url={https://github.com/litlelight/FinMamba}
+}
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [contributing guidelines](CONTRIBUTING.md) for details.
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -am 'Add new feature'`)
+4. Push to the branch (`git push origin feature/new-feature`)
+5. Create a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Taiwan Economic Journal (TEJ) for providing bankruptcy data
+- SEC for public financial filings access
+- The open-source community for foundational tools and libraries
+
+## 📞 Contact
+
+For questions or collaboration inquiries:
+
+- **Issues**: Please use [GitHub Issues](https://github.com/litlelight/FinMamba/issues)
+- **Discussions**: Join our [GitHub Discussions](https://github.com/litlelight/FinMamba/discussions)
+- **Email**: [your-email@institution.edu]
+
+---
+
+⭐ **Star this repository if you find it helpful!** ⭐
